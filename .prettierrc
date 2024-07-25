@@ -1,0 +1,7 @@
+{
+  "singleQuote": true,
+  "trailingComma": "all",
+  "vueIndentScriptAndStyle": false,
+  "indentSize": 2,
+  "indentStyle": "space"
+}
