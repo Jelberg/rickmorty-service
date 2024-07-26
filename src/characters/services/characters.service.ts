@@ -17,8 +17,21 @@ export class CharactersService {
     }
   }
 
-  async findAll() {
-    return `This action returns all episodes`;
+  async findAll(params: {
+    skip?: number;
+    take?: 5;
+    cursor?: Prisma.charactersWhereUniqueInput;
+    where?: Prisma.charactersWhereInput;
+    orderBy?: Prisma.charactersOrderByWithRelationInput;
+  }): Promise<CharactersModel[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.characters.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+    });
   }
 
   async findOne(id: number) {
