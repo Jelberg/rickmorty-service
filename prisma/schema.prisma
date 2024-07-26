@@ -37,7 +37,7 @@ model characters {
   id           Int      @id @default(autoincrement())
   fk_typestat  Int
   name         String
-  species      String
+  specie      String
   type         String
 
   type_stat   type_stat   @relation(fields: [fk_typestat], references: [id])

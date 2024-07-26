@@ -11,12 +11,22 @@ export class CharactersController {
 
   @Post()
   create(@Body() createCharacterDto: CreateCharacterDto) {
+    const { type_stat, ...data } = createCharacterDto;
+
+    const updateData: any = {
+      ...data,
+    };
+
+    if (type_stat) {
+      updateData.type_stat = {
+        connect: { id: type_stat.id },
+      };
+    }
+
     return this.charactersService.create({
-      name: createCharacterDto.name,
+      ...data,
       type_stat: {
-        connect: {
-          id: createCharacterDto.type_stat.id,
-        },
+        connect: { id: type_stat.id },
       },
     });
   }
