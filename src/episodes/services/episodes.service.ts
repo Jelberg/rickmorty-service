@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UpdateEpisodeDto } from '../dto/update-episode.dto';
 import { PrismaService } from 'src/prisma/services/prisma.service';
 import { Prisma, episodes as EpisodesModel } from '@prisma/client';
+import { STATUS } from 'src/commons/enum';
 
 @Injectable()
 export class EpisodesService {
@@ -29,7 +30,25 @@ export class EpisodesService {
     return `This action updates a #${id} episode`;
   }
 
-  async remove(id: number) {
-    return `This action removes a #${id} episode`;
+  async deleteEpisode(params: { where: Prisma.episodesWhereUniqueInput }) {
+    try {
+      const { where } = params;
+
+      const typeStatus = await this.prisma.status.findFirst({
+        include: {
+          type_stat: true,
+        },
+        where: { name: STATUS.CANCELLED },
+      });
+
+      return this.prisma.episodes.update({
+        where,
+        data: {
+          fk_typestat: typeStatus.type_stat[0].id,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
