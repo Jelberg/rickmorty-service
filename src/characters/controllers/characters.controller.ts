@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
 import { CharactersService } from '../services/characters.service';
 import { CreateCharacterDto } from '../dto/create-character.dto';
 import { UpdateCharacterDto } from '../dto/update-character.dto';
@@ -50,8 +42,10 @@ export class CharactersController {
     //return this.charactersService.update(+id, updateCharacterDto);
   }
 
-  @Delete(':id')
+  @Patch('delete/:id')
   remove(@Param('id') id: string) {
-    return this.charactersService.remove(+id);
+    return this.charactersService.deleteCharacter({
+      where: { id: Number(id) },
+    });
   }
 }
