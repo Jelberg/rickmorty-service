@@ -99,8 +99,8 @@ model subc_char_epis {
 
 model times {
   id      Int       @id @default(autoincrement())
-  init    String    @db.Interval
-  finish  String    @db.Interval
+  init    String    
+  finish  String    
 
   epis_char    epis_char[]
 
