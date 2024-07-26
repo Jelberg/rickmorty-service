@@ -21,7 +21,12 @@ export class CharactersEpisodesController {
 
   @Post()
   create(@Body() createCharactersEpisodeDto: CreateCharactersEpisodeDto) {
-    return this.charactersEpisodesService.create(createCharactersEpisodeDto);
+    return this.charactersEpisodesService.create({
+      duration: createCharactersEpisodeDto.duration,
+      characters: { connect: { id: createCharactersEpisodeDto.fk_char } },
+      episodes: { connect: { id: createCharactersEpisodeDto.fk_epis } },
+      times: { connect: { id: createCharactersEpisodeDto.fk_time } },
+    });
   }
 
   @Get()

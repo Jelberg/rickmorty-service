@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateCharactersEpisodeDto } from '../dto/create-characters-episode.dto';
 import { UpdateCharactersEpisodeDto } from '../dto/update-characters-episode.dto';
 import { PrismaService } from 'src/prisma/services/prisma.service';
 import { Prisma, epis_char as EpisCharModel } from '@prisma/client';
@@ -8,8 +7,14 @@ import { Prisma, epis_char as EpisCharModel } from '@prisma/client';
 export class CharactersEpisodesService {
   constructor(private prisma: PrismaService) {}
 
-  create(createCharactersEpisodeDto: CreateCharactersEpisodeDto) {
-    return 'This action adds a new charactersEpisode';
+  async create(data: Prisma.epis_charCreateInput): Promise<EpisCharModel> {
+    try {
+      return this.prisma.epis_char.create({
+        data,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   findAll() {
