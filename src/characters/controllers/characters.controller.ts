@@ -23,7 +23,7 @@ export class CharactersController {
 
   @Get()
   findAll() {
-    return this.charactersService.findAll();
+    return this.charactersService.findAll({});
   }
 
   @Get(':id')
