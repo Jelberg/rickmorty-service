@@ -32,7 +32,7 @@ export class EpisodesController {
 
   @Get()
   findAll() {
-    return this.episodesService.findAll();
+    return this.episodesService.findAll({});
   }
 
   @Get(':id')
@@ -40,13 +40,33 @@ export class EpisodesController {
     return this.episodesService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEpisodeDto: UpdateEpisodeDto) {
-    return this.episodesService.update(+id, updateEpisodeDto);
+  @Patch('update/:id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateEpisodeDto: UpdateEpisodeDto,
+  ) {
+    const { type_stat, ...data } = updateEpisodeDto;
+
+    const updateData: any = {
+      ...data,
+    };
+
+    if (type_stat) {
+      updateData.type_stat = {
+        connect: { id: type_stat.id },
+      };
+    }
+
+    return this.episodesService.update({
+      where: { id: Number(id) },
+      data: updateData,
+    });
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.episodesService.remove(+id);
+  @Patch('delete/:id')
+  async delete(@Param('id') id: string) {
+    return await this.episodesService.deleteEpisode({
+      where: { id: Number(id) },
+    });
   }
 }
