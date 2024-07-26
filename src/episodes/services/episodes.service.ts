@@ -18,16 +18,43 @@ export class EpisodesService {
     }
   }
 
-  async findAll() {
-    return `This action returns all episodes`;
+  async findAll(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.episodesWhereUniqueInput;
+    where?: Prisma.episodesWhereInput;
+    orderBy?: Prisma.episodesOrderByWithRelationInput;
+  }): Promise<EpisodesModel[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.episodes.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+    });
   }
 
   async findOne(id: number) {
     return `This action returns a #${id} episode`;
   }
 
-  async update(id: number, updateEpisodeDto: UpdateEpisodeDto) {
-    return `This action updates a #${id} episode`;
+  async update(params: {
+    where: Prisma.episodesWhereUniqueInput;
+    data: Prisma.episodesUpdateInput;
+  }): Promise<EpisodesModel> {
+    try {
+      console.log('llego');
+      const { data, where } = params;
+      console.log(data);
+      console.log(where);
+      return this.prisma.episodes.update({
+        data,
+        where,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async deleteEpisode(params: { where: Prisma.episodesWhereUniqueInput }) {
