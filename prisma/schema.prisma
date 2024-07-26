@@ -48,6 +48,7 @@ model episodes {
   fk_typestat Int
   name       String
   episode    String
+  is_deleted Boolean  @default(false)
   duration   Int      // Duración en minutos (Máximo 60 MIN)
 
   type_stat   type_stat   @relation(fields: [fk_typestat], references: [id])
