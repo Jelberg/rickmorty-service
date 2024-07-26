@@ -45,8 +45,10 @@ export class EpisodesController {
     return this.episodesService.update(+id, updateEpisodeDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.episodesService.remove(+id);
+  @Patch('delete/:id')
+  async delete(@Param('id') id: string) {
+    return await this.episodesService.deleteEpisode({
+      where: { id: Number(id) },
+    });
   }
 }
