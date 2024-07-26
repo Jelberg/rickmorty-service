@@ -29,16 +29,6 @@ export class CharactersEpisodesController {
     });
   }
 
-  @Get()
-  findAll() {
-    return this.charactersEpisodesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.charactersEpisodesService.findOne(+id);
-  }
-
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -52,6 +42,6 @@ export class CharactersEpisodesController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.charactersEpisodesService.remove(+id);
+    return this.charactersEpisodesService.remove({ id: Number(id) });
   }
 }
