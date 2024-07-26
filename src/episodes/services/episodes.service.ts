@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { UpdateEpisodeDto } from '../dto/update-episode.dto';
 import { PrismaService } from 'src/prisma/services/prisma.service';
 import { Prisma, episodes as EpisodesModel } from '@prisma/client';
 import { STATUS } from 'src/commons/enum';
@@ -20,7 +19,7 @@ export class EpisodesService {
 
   async findAll(params: {
     skip?: number;
-    take?: number;
+    take?: 5;
     cursor?: Prisma.episodesWhereUniqueInput;
     where?: Prisma.episodesWhereInput;
     orderBy?: Prisma.episodesOrderByWithRelationInput;
