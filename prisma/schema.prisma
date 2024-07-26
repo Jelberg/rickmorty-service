@@ -10,93 +10,95 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model TYPES {
-  type_id    Int      @id @default(autoincrement())
-  type_name  String   // ['EPISODES', 'CHARACTERS']
-  TYPE_STAT  TYPE_STAT[]
+model types {
+  id    Int      @id @default(autoincrement())
+  name  String   // ['EPISODES', 'CHARACTERS']
+  type_stat  type_stat[]
 }
 
-model STATUS {
-  stat_id   Int      @id @default(autoincrement())
-  stat_name String   // ['ACTIVE', 'SUSPENDED', 'CANCELLED', 'ACTIVE']
-  TYPE_STAT TYPE_STAT[]
+model status {
+  id   Int      @id @default(autoincrement())
+  name String   // ['ACTIVE', 'SUSPENDED', 'CANCELLED', 'ACTIVE']
+  type_stat type_stat[]
 }
 
-model TYPE_STAT {
-  ts_id        Int      @id @default(autoincrement())
-  ts_fk_type   Int
-  ts_fk_state  Int
+model type_stat {
+  id        Int      @id @default(autoincrement())
+  fk_type   Int
+  fk_state  Int
 
-  TYPES    TYPES    @relation(fields: [ts_fk_type], references: [type_id])
-  STATUS   STATUS   @relation(fields: [ts_fk_state], references: [stat_id])
-  CHARACTERS  CHARACTERS[]
-  EPISODES    EPISODES[]
+  types    types    @relation(fields: [fk_type], references: [id])
+  status   status   @relation(fields: [fk_state], references: [id])
+  characters  characters[]
+  episodes    episodes[]
 }
 
-model CHARACTERS {
-  char_id        Int      @id @default(autoincrement())
-  char_fk_typestat Int
-  char_name      String
+model characters {
+  id        Int      @id @default(autoincrement())
+  fk_typestat Int
+  name      String
 
-  TYPE_STAT   TYPE_STAT   @relation(fields: [char_fk_typestat], references: [ts_id])
-  SUBC_CHAR_EPIS SUBC_CHAR_EPIS[]
-  EPIS_CHAR      EPIS_CHAR[]
+  type_stat   type_stat   @relation(fields: [fk_typestat], references: [id])
+  subc_char_epis subc_char_epis[]
+  epis_char      epis_char[]
 }
 
-model EPISODES {
-  epis_id         Int      @id @default(autoincrement())
-  epis_fk_typestat Int
-  epis_duration   Int      // Duración en minutos (Máximo 60 MIN)
+model episodes {
+  id         Int      @id @default(autoincrement())
+  fk_typestat Int
+  name       String
+  episode    String
+  duration   Int      // Duración en minutos (Máximo 60 MIN)
 
-  TYPE_STAT   TYPE_STAT   @relation(fields: [epis_fk_typestat], references: [ts_id])
-  SUBC_CHAR_EPIS SUBC_CHAR_EPIS[]
-  EPIS_CHAR      EPIS_CHAR[]
+  type_stat   type_stat   @relation(fields: [fk_typestat], references: [id])
+  subc_char_epis subc_char_epis[]
+  epis_char      epis_char[]
 }
 
-model CATEGORIES {
-  cate_id        Int       @id @default(autoincrement())
-  cate_name      String
-  SUBCATEGORIES  SUBCATEGORIES[]
+model categories {
+  id        Int       @id @default(autoincrement())
+  name      String
+  subcategories  subcategories[]
 }
 
-model SUBCATEGORIES {
-  subc_id        Int       @id @default(autoincrement())
-  subc_name      String
-  subc_fk_cate   Int       // Campo escalar para la clave foránea
+model subcategories {
+  id        Int       @id @default(autoincrement())
+  name      String
+  fk_cate   Int       // Campo escalar para la clave foránea
 
-  CATEGORIES     CATEGORIES     @relation(fields: [subc_fk_cate], references: [cate_id])
-  SUBC_CHAR_EPIS SUBC_CHAR_EPIS[]
+  categories     categories     @relation(fields: [fk_cate], references: [id])
+  subc_char_epis subc_char_epis[]
 }
 
-model EPIS_CHAR {
-  ec_id         Int      @id @default(autoincrement())
-  ec_fk_char    Int      // Campo escalar para la clave foránea
-  ec_fk_epis    Int      // Campo escalar para la clave foránea
-  ec_fk_time    Int      // Campo escalar para la clave foránea
-  ec_duration   Int      // Duración en minutos
+model epis_char {
+  id         Int      @id @default(autoincrement())
+  fk_char    Int      // Campo escalar para la clave foránea
+  fk_epis    Int      // Campo escalar para la clave foránea
+  fk_time    Int      // Campo escalar para la clave foránea
+  duration   Int      // Duración en minutos
 
-  CHARACTERS    CHARACTERS  @relation(fields: [ec_fk_char], references: [char_id])
-  EPISODES      EPISODES    @relation(fields: [ec_fk_epis], references: [epis_id])
-  TIMES         TIMES       @relation(fields: [ec_fk_time], references: [time_id])
+  characters    characters  @relation(fields: [fk_char], references: [id])
+  episodes      episodes    @relation(fields: [fk_epis], references: [id])
+  times         times       @relation(fields: [fk_time], references: [id])
 }
 
-model SUBC_CHAR_EPIS {
-  sce_id         Int      @id @default(autoincrement())
-  sce_fk_char    Int      // Campo escalar para la clave foránea
-  sce_fk_subc    Int      // Campo escalar para la clave foránea
-  sce_fk_epis    Int      // Campo escalar para la clave foránea
+model subc_char_epis {
+  id         Int      @id @default(autoincrement())
+  fk_char    Int      // Campo escalar para la clave foránea
+  fk_subc    Int      // Campo escalar para la clave foránea
+  fk_epis    Int      // Campo escalar para la clave foránea
 
-  CHARACTERS     CHARACTERS     @relation(fields: [sce_fk_char], references: [char_id])
-  SUBCATEGORIES  SUBCATEGORIES  @relation(fields: [sce_fk_subc], references: [subc_id])
-  EPISODES       EPISODES       @relation(fields: [sce_fk_epis], references: [epis_id])
+  characters     characters     @relation(fields: [fk_char], references: [id])
+  subcategories  subcategories  @relation(fields: [fk_subc], references: [id])
+  episodes       episodes       @relation(fields: [fk_epis], references: [id])
 
-  @@unique([sce_fk_char, sce_fk_subc, sce_fk_epis]) // Garantiza la unicidad de esta combinación
+  @@unique([fk_char, fk_subc, fk_epis]) // Garantiza la unicidad de esta combinación
 }
 
-model TIMES {
-  time_id      Int      @id @default(autoincrement())
-  time_init    DateTime
-  time_finish  DateTime
+model times {
+  id      Int      @id @default(autoincrement())
+  init    DateTime
+  finish  DateTime
 
-  EPIS_CHAR    EPIS_CHAR[]
+  epis_char    epis_char[]
 }
