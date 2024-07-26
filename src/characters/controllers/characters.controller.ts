@@ -31,15 +31,26 @@ export class CharactersController {
     return this.charactersService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Patch('update/:id')
   update(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @Param('id') id: string,
-    //eslint-disable-next-line @typescript-eslint/no-unused-vars
     @Body() updateCharacterDto: UpdateCharacterDto,
   ) {
-    return;
-    //return this.charactersService.update(+id, updateCharacterDto);
+    const { type_stat, ...data } = updateCharacterDto;
+
+    const updateData: any = {
+      ...data,
+    };
+
+    if (type_stat) {
+      updateData.type_stat = {
+        connect: { id: type_stat.id },
+      };
+    }
+    return this.charactersService.update({
+      where: { id: Number(id) },
+      data: updateData,
+    });
   }
 
   @Patch('delete/:id')

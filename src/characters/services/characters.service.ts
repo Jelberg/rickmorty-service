@@ -25,6 +25,21 @@ export class CharactersService {
     return `This action returns a #${id} episode`;
   }
 
+  async update(params: {
+    where: Prisma.charactersWhereUniqueInput;
+    data: Prisma.charactersUpdateInput;
+  }): Promise<CharactersModel> {
+    try {
+      const { data, where } = params;
+      return this.prisma.characters.update({
+        data,
+        where,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async deleteCharacter(params: { where: Prisma.episodesWhereUniqueInput }) {
     try {
       const { where } = params;
