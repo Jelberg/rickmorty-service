@@ -255,21 +255,17 @@ export class EpisodesService {
     }
   }
 
-  async deleteEpisode(params: { where: Prisma.episodesWhereUniqueInput }) {
+  async deleteEpisode(id: number) {
     try {
-      const { where } = params;
-
-      const typeStatus = await this.prisma.status.findFirst({
-        include: {
-          type_stat: true,
-        },
-        where: { name: STATUS.CANCELLED },
-      });
+      const typeStatus = await this.getTypeStat(
+        STATUS.SUSPENDED,
+        TYPES.EPISODES,
+      );
 
       return this.prisma.episodes.update({
-        where,
+        where: { id: id },
         data: {
-          fk_typestat: typeStatus.type_stat[0].id,
+          fk_typestat: typeStatus.id,
         },
       });
     } catch (error) {
