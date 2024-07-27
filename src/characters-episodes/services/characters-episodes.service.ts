@@ -151,13 +151,55 @@ export class CharactersEpisodesService {
     return `This action returns a #${id} charactersEpisode`;
   }
 
-  async update(
-    id: number,
-    updateCharactersEpisodeDto: UpdateCharactersEpisodeDto,
-  ) {
+  async update(id: number, data: UpdateCharactersEpisodeDto) {
     try {
-      // Aquí debes implementar la lógica de actualización
-      return `This action updates a #${id} charactersEpisode`;
+      const epis_chat = await this.prisma.epis_char.findUnique({
+        where: {
+          id: id,
+        },
+      });
+      if (!epis_chat) {
+        throw new BadRequestException('Episode x Character not found');
+      }
+
+      this.isTimeLessThan(data.time_init, data.time_finish);
+
+      const epis_char_times = await this.getAllCharactersEpisodesByCharIdEpiId(
+        epis_chat.fk_epis,
+        epis_chat.fk_char,
+      );
+
+      const times = epis_char_times
+        .filter((elem) => elem.id != id)
+        .map((elem) => elem.times);
+
+      const newStart = this.parseTimeToDate(data.time_init.value);
+      const newEnd = this.parseTimeToDate(data.time_finish.value);
+
+      if (this.isOverlapping(newStart, newEnd, times)) {
+        throw new BadRequestException(
+          'New time period overlaps with existing times.',
+        );
+      }
+
+      const duration = this.calculateDuration(data.time_init, data.time_finish);
+      if (this.isDurationExceeded(duration, times)) {
+        throw new BadRequestException('New Character period exceeds.');
+      }
+
+      return await this.prisma.epis_char.update({
+        where: {
+          id,
+        },
+        data: {
+          times: {
+            update: {
+              init: data.time_init.value,
+              finish: data.time_finish.value,
+            },
+          },
+        },
+      });
     } catch (error) {
       if (error instanceof Error) {
         throw new InternalServerErrorException(error.message);
@@ -294,6 +336,9 @@ export class CharactersEpisodesService {
     newEnd: Date,
     existingTimes: { id: number; init: string; finish: string }[],
   ): boolean {
+    console.log(existingTimes);
+    console.log(newStart);
+    console.log(newEnd);
     return existingTimes.some(({ init, finish }) => {
       const parseInit = this.parseTimeToDate(init);
       const parseFinish = this.parseTimeToDate(finish);
