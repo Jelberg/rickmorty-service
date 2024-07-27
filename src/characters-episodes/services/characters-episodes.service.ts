@@ -8,6 +8,7 @@ import { PrismaService } from 'src/prisma/services/prisma.service';
 import { Prisma, epis_char as EpisCharModel } from '@prisma/client';
 import { CreateCharactersEpisodeDto } from '../dto/create-characters-episode.dto';
 import { mapEpisodes, mapTypeStat } from 'src/commons/mappers/character.mapper';
+import { ParseTimePipe } from 'src/pipes/parse-time/parse-time.pipe';
 
 @Injectable()
 export class CharactersEpisodesService {
@@ -23,9 +24,6 @@ export class CharactersEpisodesService {
       }
       this.isTimeLessThan(data.time_init, data.time_finish);
 
-      // TODO: No puedo registrar si la suma de las apariciones del personaje en el cap es mayor a 60 min
-      //const duration = this.calculateDuration(data.time_init, data.time_finish);
-
       const epis_char = await this.getAllCharactersEpisodesByCharIdEpiId(
         data.fk_epis,
         data.fk_char,
@@ -40,6 +38,10 @@ export class CharactersEpisodesService {
         throw new BadRequestException(
           'New time period overlaps with existing times.',
         );
+      }
+      const duration = this.calculateDuration(data.time_init, data.time_finish);
+      if (this.isDurationExceeded(duration, times)) {
+        throw new BadRequestException('New Character period exceeds.');
       }
 
       const time = await this.prisma.times.create({
@@ -212,7 +214,7 @@ export class CharactersEpisodesService {
 
   //______________________________________________________________________
 
-  async calculateDuration(
+  calculateDuration(
     time_init: { minutes: number; seconds: number },
     time_finish: { minutes: number; seconds: number },
   ) {
@@ -297,6 +299,24 @@ export class CharactersEpisodesService {
       const parseFinish = this.parseTimeToDate(finish);
       return newStart < parseFinish && newEnd > parseInit;
     });
+  }
+
+  isDurationExceeded(
+    currentDuration: number,
+    existingTimes: { id: number; init: string; finish: string }[],
+  ): boolean {
+    let count = 0;
+    existingTimes.forEach(({ init, finish }) => {
+      const transformTimeInit = new ParseTimePipe().transform(init);
+      const transformTimeFinish = new ParseTimePipe().transform(finish);
+      const calculateDuration = this.calculateDuration(
+        transformTimeInit,
+        transformTimeFinish,
+      );
+      count = count + calculateDuration;
+    });
+    const total = count + currentDuration;
+    return total > 60;
   }
 
   parseTimeToDate(value: string): Date {
