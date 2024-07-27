@@ -1,29 +1,30 @@
-import { IsString, IsNumber, Max, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsObject, IsString, IsNumber, Max, IsIn } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-
-class TypeStatDto {
-  @IsNumber()
-  @ApiProperty({ description: 'ID of the TypeStat' })
-  id: number;
-}
+import { SeasonEpisodePipe } from 'src/pipes/season-episode/season-episode.pipe';
+import { Transform, Type } from 'class-transformer';
+import { STATUS } from 'src/commons/enum';
 
 export class CreateEpisodeDto {
-  @ApiProperty({ description: 'Epidsode name' })
+  @ApiProperty({ description: 'Episode name' })
   @IsString()
   name: string;
 
-  @ApiProperty({ description: 'Season and chapter string' })
-  @IsString()
-  episode: string;
+  @ApiProperty({ description: 'Season and episode string in format S01E04' })
+  @IsObject()
+  @Transform(({ value }) => {
+    const pipe = new SeasonEpisodePipe(); // O el pipe que hayas creado
+    return pipe.transform(value);
+  })
+  @Type(() => Object) // Indica que esperamos un objeto
+  episode: { season: string; episode: string };
 
   @ApiProperty({ description: 'Duration in minutes (max 60)' })
-  @Max(60)
   @IsNumber()
+  @Max(60)
   duration: number;
 
-  @ApiProperty({ description: 'ID of the TypeStat' })
-  @ValidateNested()
-  @Type(() => TypeStatDto)
-  type_stat: TypeStatDto;
+  @ApiProperty({ description: 'Status of the episode' })
+  @IsString()
+  @IsIn([STATUS.ACTIVE, STATUS.SUSPENDED])
+  status: string;
 }

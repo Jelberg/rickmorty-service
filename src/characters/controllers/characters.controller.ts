@@ -7,24 +7,24 @@ import {
   Param,
   Query,
 } from '@nestjs/common';
-import { EpisodesService } from '../services/episodes.service';
-import { CreateEpisodeDto } from '../dto/create-episode.dto';
-import { UpdateEpisodeDto } from '../dto/update-episode.dto';
+import { CharactersService } from '../services/characters.service';
+import { CreateCharacterDto } from '../dto/create-character.dto';
+import { UpdateCharacterDto } from '../dto/update-character.dto';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 
-@Controller('episodes')
-@ApiTags('Episodes')
-export class EpisodesController {
-  constructor(private readonly episodesService: EpisodesService) {}
+@Controller('characters')
+@ApiTags('Characters')
+export class CharactersController {
+  constructor(private readonly charactersService: CharactersService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new episodes' })
-  create(@Body() createEpisodeDto: CreateEpisodeDto) {
-    return this.episodesService.create(createEpisodeDto);
+  @ApiOperation({ summary: 'Create a new character' })
+  create(@Body() createCharacterDto: CreateCharacterDto) {
+    return this.charactersService.create(createCharacterDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all episodes with pagination' })
+  @ApiOperation({ summary: 'Get all character with pagination' })
   @ApiQuery({
     name: 'page',
     required: false,
@@ -67,8 +67,7 @@ export class EpisodesController {
     const parsedCursor = cursor ? JSON.parse(cursor) : undefined;
     const parsedWhere = where ? JSON.parse(where) : undefined;
     const parsedOrderBy = orderBy ? JSON.parse(orderBy) : undefined;
-
-    return this.episodesService.findAll({
+    return this.charactersService.findAll({
       page: pageNumber,
       pageSize: pageSizeNumber,
       cursor: parsedCursor,
@@ -79,22 +78,24 @@ export class EpisodesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.episodesService.findOne(+id);
+    return this.charactersService.findOne(+id);
   }
 
   @Patch('update/:id')
-  @ApiOperation({ summary: 'Update an episode' })
-  async update(
-    @Param('id') id: string,
-    @Body() updateEpisodeDto: UpdateEpisodeDto,
+  @ApiOperation({ summary: 'Update a character' })
+  update(
+    @Param('id') id: number,
+    @Body() updateCharacterDto: UpdateCharacterDto,
   ) {
-    console.log(updateEpisodeDto);
-    return this.episodesService.update(+id, updateEpisodeDto);
+    return this.charactersService.update(id, updateCharacterDto);
   }
 
   @Patch('delete/:id')
-  async delete(@Param('id') id: string) {
-    return await this.episodesService.deleteEpisode({
+  @ApiOperation({
+    summary: 'Delete: change status to suspended by character id',
+  })
+  remove(@Param('id') id: string) {
+    return this.charactersService.deleteCharacter({
       where: { id: Number(id) },
     });
   }
