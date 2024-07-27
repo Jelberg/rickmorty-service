@@ -67,20 +67,34 @@ export class CharactersService {
   }
 
   async findAll(params: {
-    skip?: number;
-    take?: number;
+    page?: number;
+    pageSize?: number;
     cursor?: Prisma.charactersWhereUniqueInput;
     where?: Prisma.charactersWhereInput;
     orderBy?: Prisma.charactersOrderByWithRelationInput;
-  }): Promise<CharactersModel[]> {
-    const { skip, take, cursor, where, orderBy } = params;
-    return this.prisma.characters.findMany({
+  }): Promise<{ info: any; results: any }> {
+    const { page = 1, pageSize = 5, cursor, where, orderBy } = params;
+    const skip = (page - 1) * pageSize;
+    const take = pageSize;
+    const results = await this.prisma.characters.findMany({
       skip,
       take,
       cursor,
       where,
       orderBy,
     });
+
+    const totalCount = await this.prisma.characters.count({
+      where,
+    });
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    const info = {
+      count: totalCount,
+      pages: totalPages,
+    };
+
+    return { info, results };
   }
 
   async findOne(id: number) {
