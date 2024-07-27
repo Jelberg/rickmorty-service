@@ -28,8 +28,9 @@ export class CharactersEpisodesController {
     );
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.charactersEpisodesService.remove({ id: Number(id) });
+  @Delete(':char_id/:epis_id')
+  @ApiOperation({ summary: 'Remove a Characters x Episode' })
+  remove(@Param('char_id') char_id: number, @Param('epis_id') epis_id: number) {
+    return this.charactersEpisodesService.remove(char_id, epis_id);
   }
 }

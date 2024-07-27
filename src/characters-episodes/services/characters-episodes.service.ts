@@ -118,13 +118,42 @@ export class CharactersEpisodesService {
     }
   }
 
-  async remove(
-    where: Prisma.epis_charWhereUniqueInput,
-  ): Promise<EpisCharModel> {
+  async remove(char_id: number, epis_id: number) {
     try {
-      return await this.prisma.epis_char.delete({
-        where,
+      const relatedTimes = await this.prisma.epis_char.findMany({
+        where: {
+          fk_char: char_id,
+          fk_epis: epis_id,
+        },
+        select: {
+          fk_time: true,
+        },
       });
+
+      const timeIds = relatedTimes.map((record) => record.fk_time);
+
+      const deleteEpisCharResult = await this.prisma.epis_char.deleteMany({
+        where: {
+          fk_char: char_id,
+          fk_epis: epis_id,
+        },
+      });
+
+      if (timeIds.length > 0) {
+        const deleteTimesResult = await this.prisma.times.deleteMany({
+          where: {
+            id: {
+              in: timeIds,
+            },
+          },
+        });
+        console.log(`Deleted ${deleteTimesResult.count} times records`);
+      }
+
+      return {
+        deletedEpisCharCount: deleteEpisCharResult.count,
+        message: `Deleted ${deleteEpisCharResult.count} epis_char records and related times records`,
+      };
     } catch (error) {
       if (error instanceof Error) {
         throw new InternalServerErrorException(error.message);
