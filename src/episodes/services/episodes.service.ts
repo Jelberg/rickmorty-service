@@ -43,10 +43,7 @@ export class EpisodesService {
     data: Prisma.episodesUpdateInput;
   }): Promise<EpisodesModel> {
     try {
-      console.log('llego');
       const { data, where } = params;
-      console.log(data);
-      console.log(where);
       return this.prisma.episodes.update({
         data,
         where,

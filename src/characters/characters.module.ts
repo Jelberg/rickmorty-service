@@ -6,5 +6,6 @@ import { CharactersController } from './controllers/characters.controller';
 @Module({
   controllers: [CharactersController],
   providers: [CharactersService, PrismaService],
+  imports: [],
 })
 export class CharactersModule {}
