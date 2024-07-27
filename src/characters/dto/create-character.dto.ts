@@ -1,12 +1,9 @@
-import { Type } from 'class-transformer';
+//Import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNumber,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { IsEmpty, IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
+import { STATUS } from 'src/commons/enum';
 
+//eslint-disable-next-line
 class TypeStatDto {
   @IsNumber()
   @ApiProperty({ description: 'ID of the TypeStat' })
@@ -19,17 +16,23 @@ export class CreateCharacterDto {
   name: string;
 
   @IsString()
-  @ApiProperty({ description: 'Character specie name' })
+  @ApiProperty({ description: 'Character specie name Example: Human, Alien' })
   specie: string;
+
+  @IsEmpty()
+  @IsString()
+  @ApiProperty({ description: 'Character type' })
+  type: string;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: 'Character type' })
-  type?: string;
+  @IsIn([STATUS.ACTIVE, STATUS.SUSPENDED])
+  @ApiProperty({ description: 'Character status' })
+  status_char?: string;
 
-  @IsOptional()
+  /*@IsOptional()
   @ApiProperty({ description: 'ID of the TypeStat' })
   @ValidateNested()
   @Type(() => TypeStatDto)
-  type_stat?: TypeStatDto;
+  type_stat?: TypeStatDto;*/
 }

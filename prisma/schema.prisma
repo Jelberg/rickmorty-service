@@ -37,8 +37,7 @@ model characters {
   id           Int      @id @default(autoincrement())
   fk_typestat  Int
   name         String
-  specie      String
-  type         String
+  type         String?
 
   type_stat   type_stat   @relation(fields: [fk_typestat], references: [id])
   subc_char_epis subc_char_epis[]
@@ -86,13 +85,13 @@ model epis_char {
 
 model subc_char_epis {
   id         Int      @id @default(autoincrement())
-  fk_char    Int      // Campo escalar para la clave foránea
+  fk_char    Int?      // Campo escalar para la clave foránea
   fk_subc    Int      // Campo escalar para la clave foránea
-  fk_epis    Int      // Campo escalar para la clave foránea
+  fk_epis    Int?      // Campo escalar para la clave foránea
 
-  characters     characters     @relation(fields: [fk_char], references: [id])
+  characters     characters?     @relation(fields: [fk_char], references: [id])
   subcategories  subcategories  @relation(fields: [fk_subc], references: [id])
-  episodes       episodes       @relation(fields: [fk_epis], references: [id])
+  episodes       episodes?       @relation(fields: [fk_epis], references: [id])
 
   @@unique([fk_char, fk_subc, fk_epis]) // Garantiza la unicidad de esta combinación
 }

@@ -18,6 +18,23 @@ async function main() {
     ],
   });
 
+  await prisma.categories.createMany({
+    data: [
+      { id: 1, name: 'specie' },
+      { id: 2, name: 'season' },
+    ],
+  });
+
+  await prisma.subcategories.createMany({
+    data: [
+      { id: 1, fk_cate: 1, name: 'human' },
+      { id: 2, fk_cate: 1, name: 'alien' },
+      { id: 3, fk_cate: 2, name: 'season 1' },
+      { id: 4, fk_cate: 2, name: 'season 2' },
+      { id: 5, fk_cate: 2, name: 'season 3' },
+    ],
+  });
+
   await prisma.type_stat.createMany({
     data: [
       {
