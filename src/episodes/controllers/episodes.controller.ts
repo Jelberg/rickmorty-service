@@ -1,8 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { EpisodesService } from '../services/episodes.service';
 import { CreateEpisodeDto } from '../dto/create-episode.dto';
 import { UpdateEpisodeDto } from '../dto/update-episode.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @Controller('episodes')
 @ApiTags('Episodes')
@@ -10,21 +18,63 @@ export class EpisodesController {
   constructor(private readonly episodesService: EpisodesService) {}
 
   @Post()
+  @ApiOperation({ summary: 'Create a new episodes' })
   create(@Body() createEpisodeDto: CreateEpisodeDto) {
-    const { name, episode, duration, type_stat } = createEpisodeDto;
-    return this.episodesService.create({
-      name,
-      episode,
-      duration,
-      type_stat: {
-        connect: { id: type_stat.id },
-      },
-    });
+    return this.episodesService.create(createEpisodeDto);
   }
 
   @Get()
-  findAll() {
-    return this.episodesService.findAll({});
+  @ApiOperation({ summary: 'Get all episodes with pagination' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number',
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    type: Number,
+    description: 'Number of items per page',
+  })
+  @ApiQuery({
+    name: 'cursor',
+    required: false,
+    type: String,
+    description: 'Cursor for pagination',
+  })
+  @ApiQuery({
+    name: 'where',
+    required: false,
+    type: String,
+    description: 'Filter conditions in JSON format',
+  })
+  @ApiQuery({
+    name: 'orderBy',
+    required: false,
+    type: String,
+    description: 'Sorting conditions in JSON format',
+  })
+  findAll(
+    @Query('page') page: string = '1',
+    @Query('pageSize') pageSize: string = '5',
+    @Query('cursor') cursor?: string,
+    @Query('where') where?: string,
+    @Query('orderBy') orderBy?: string,
+  ) {
+    const pageNumber = parseInt(page, 10);
+    const pageSizeNumber = parseInt(pageSize, 10);
+    const parsedCursor = cursor ? JSON.parse(cursor) : undefined;
+    const parsedWhere = where ? JSON.parse(where) : undefined;
+    const parsedOrderBy = orderBy ? JSON.parse(orderBy) : undefined;
+
+    return this.episodesService.findAll({
+      page: pageNumber,
+      pageSize: pageSizeNumber,
+      cursor: parsedCursor,
+      where: parsedWhere,
+      orderBy: parsedOrderBy,
+    });
   }
 
   @Get(':id')
@@ -33,32 +83,17 @@ export class EpisodesController {
   }
 
   @Patch('update/:id')
+  @ApiOperation({ summary: 'Update an episode' })
   async update(
     @Param('id') id: string,
     @Body() updateEpisodeDto: UpdateEpisodeDto,
   ) {
-    const { type_stat, ...data } = updateEpisodeDto;
-
-    const updateData: any = {
-      ...data,
-    };
-
-    if (type_stat) {
-      updateData.type_stat = {
-        connect: { id: type_stat.id },
-      };
-    }
-
-    return this.episodesService.update({
-      where: { id: Number(id) },
-      data: updateData,
-    });
+    console.log(updateEpisodeDto);
+    return this.episodesService.update(+id, updateEpisodeDto);
   }
 
   @Patch('delete/:id')
-  async delete(@Param('id') id: string) {
-    return await this.episodesService.deleteEpisode({
-      where: { id: Number(id) },
-    });
+  async delete(@Param('id') id: number) {
+    return await this.episodesService.deleteEpisode(id);
   }
 }

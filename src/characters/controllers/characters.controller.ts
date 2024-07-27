@@ -1,8 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { CharactersService } from '../services/characters.service';
 import { CreateCharacterDto } from '../dto/create-character.dto';
 import { UpdateCharacterDto } from '../dto/update-character.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @Controller('characters')
 @ApiTags('Characters')
@@ -10,20 +18,62 @@ export class CharactersController {
   constructor(private readonly charactersService: CharactersService) {}
 
   @Post()
+  @ApiOperation({ summary: 'Create a new character' })
   create(@Body() createCharacterDto: CreateCharacterDto) {
-    return this.charactersService.create({
-      name: createCharacterDto.name,
-      type_stat: {
-        connect: {
-          id: createCharacterDto.type_stat.id,
-        },
-      },
-    });
+    return this.charactersService.create(createCharacterDto);
   }
 
   @Get()
-  findAll() {
-    return this.charactersService.findAll({});
+  @ApiOperation({ summary: 'Get all character with pagination' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number',
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    type: Number,
+    description: 'Number of items per page',
+  })
+  @ApiQuery({
+    name: 'cursor',
+    required: false,
+    type: String,
+    description: 'Cursor for pagination',
+  })
+  @ApiQuery({
+    name: 'where',
+    required: false,
+    type: String,
+    description: 'Filter conditions in JSON format',
+  })
+  @ApiQuery({
+    name: 'orderBy',
+    required: false,
+    type: String,
+    description: 'Sorting conditions in JSON format',
+  })
+  findAll(
+    @Query('page') page: string = '1',
+    @Query('pageSize') pageSize: string = '5',
+    @Query('cursor') cursor?: string,
+    @Query('where') where?: string,
+    @Query('orderBy') orderBy?: string,
+  ) {
+    const pageNumber = parseInt(page, 10);
+    const pageSizeNumber = parseInt(pageSize, 10);
+    const parsedCursor = cursor ? JSON.parse(cursor) : undefined;
+    const parsedWhere = where ? JSON.parse(where) : undefined;
+    const parsedOrderBy = orderBy ? JSON.parse(orderBy) : undefined;
+    return this.charactersService.findAll({
+      page: pageNumber,
+      pageSize: pageSizeNumber,
+      cursor: parsedCursor,
+      where: parsedWhere,
+      orderBy: parsedOrderBy,
+    });
   }
 
   @Get(':id')
@@ -32,28 +82,18 @@ export class CharactersController {
   }
 
   @Patch('update/:id')
+  @ApiOperation({ summary: 'Update a character' })
   update(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateCharacterDto: UpdateCharacterDto,
   ) {
-    const { type_stat, ...data } = updateCharacterDto;
-
-    const updateData: any = {
-      ...data,
-    };
-
-    if (type_stat) {
-      updateData.type_stat = {
-        connect: { id: type_stat.id },
-      };
-    }
-    return this.charactersService.update({
-      where: { id: Number(id) },
-      data: updateData,
-    });
+    return this.charactersService.update(id, updateCharacterDto);
   }
 
   @Patch('delete/:id')
+  @ApiOperation({
+    summary: 'Delete: change status to suspended by character id',
+  })
   remove(@Param('id') id: string) {
     return this.charactersService.deleteCharacter({
       where: { id: Number(id) },

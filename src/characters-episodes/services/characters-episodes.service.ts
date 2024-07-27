@@ -25,11 +25,18 @@ export class CharactersEpisodesService {
     return `This action returns a #${id} charactersEpisode`;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   update(id: number, updateCharactersEpisodeDto: UpdateCharactersEpisodeDto) {
     return `This action updates a #${id} charactersEpisode`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} charactersEpisode`;
+  remove(where: Prisma.epis_charWhereUniqueInput): Promise<EpisCharModel> {
+    try {
+      return this.prisma.epis_char.delete({
+        where,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
