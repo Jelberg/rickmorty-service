@@ -1,6 +1,6 @@
 //Import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmpty, IsIn, IsOptional, IsString } from 'class-validator';
+import { IsIn, IsOptional, IsString } from 'class-validator';
 import { STATUS } from 'src/commons/enum';
 
 export class CreateCharacterDto {
@@ -12,7 +12,7 @@ export class CreateCharacterDto {
   @ApiProperty({ description: 'Character specie name Example: Human, Alien' })
   specie: string;
 
-  @IsEmpty()
+  @IsOptional()
   @IsString()
   @ApiProperty({ description: 'Character type' })
   type: string;

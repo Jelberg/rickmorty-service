@@ -2,20 +2,19 @@ import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class ParseTimePipe implements PipeTransform {
-  transform(value: string) {
-    const parsedTime = this.parseTime(value);
-    if (!parsedTime) {
-      throw new BadRequestException(
-        'Invalid time format. Expected format MM:SS and not greater than 60:00',
-      );
+  transform(value: string): {
+    minutes: number;
+    seconds: number;
+    value: string;
+  } {
+    if (typeof value !== 'string') {
+      throw new BadRequestException('Time must be a string');
     }
-    return parsedTime;
-  }
-
-  private parseTime(timeString: string) {
-    const timeParts = timeString.split(':');
+    const timeParts = value.split(':');
     if (timeParts.length !== 2) {
-      return null;
+      throw new BadRequestException(
+        `Invalid time format ${value}. Expected format MM:SS`,
+      );
     }
 
     const minutes = parseInt(timeParts[0], 10);
@@ -30,9 +29,16 @@ export class ParseTimePipe implements PipeTransform {
       seconds >= 60 ||
       (minutes === 60 && seconds !== 0)
     ) {
-      return null;
+      throw new BadRequestException(
+        `Invalid time format ${value}. Expected format MM:SS and not greater than 60:00`,
+      );
     }
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+    const formattedSeconds = seconds.toString().padStart(2, '0');
+    value = `${formattedMinutes}:${formattedSeconds}`;
 
-    return { minutes, seconds };
+    console.log(minutes, seconds, value);
+
+    return { minutes, seconds, value };
   }
 }
