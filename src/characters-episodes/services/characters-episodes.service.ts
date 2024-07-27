@@ -8,6 +8,7 @@ import { PrismaService } from 'src/prisma/services/prisma.service';
 import { Prisma, epis_char as EpisCharModel } from '@prisma/client';
 import { CreateCharactersEpisodeDto } from '../dto/create-characters-episode.dto';
 import { mapEpisodes, mapTypeStat } from 'src/commons/mappers/character.mapper';
+import { ParseTimePipe } from 'src/pipes/parse-time/parse-time.pipe';
 
 @Injectable()
 export class CharactersEpisodesService {
@@ -23,9 +24,6 @@ export class CharactersEpisodesService {
       }
       this.isTimeLessThan(data.time_init, data.time_finish);
 
-      // TODO: No puedo registrar si la suma de las apariciones del personaje en el cap es mayor a 60 min
-      //const duration = this.calculateDuration(data.time_init, data.time_finish);
-
       const epis_char = await this.getAllCharactersEpisodesByCharIdEpiId(
         data.fk_epis,
         data.fk_char,
@@ -40,6 +38,10 @@ export class CharactersEpisodesService {
         throw new BadRequestException(
           'New time period overlaps with existing times.',
         );
+      }
+      const duration = this.calculateDuration(data.time_init, data.time_finish);
+      if (this.isDurationExceeded(duration, times)) {
+        throw new BadRequestException('New Character period exceeds.');
       }
 
       const time = await this.prisma.times.create({
@@ -149,13 +151,55 @@ export class CharactersEpisodesService {
     return `This action returns a #${id} charactersEpisode`;
   }
 
-  async update(
-    id: number,
-    updateCharactersEpisodeDto: UpdateCharactersEpisodeDto,
-  ) {
+  async update(id: number, data: UpdateCharactersEpisodeDto) {
     try {
-      // Aquí debes implementar la lógica de actualización
-      return `This action updates a #${id} charactersEpisode`;
+      const epis_chat = await this.prisma.epis_char.findUnique({
+        where: {
+          id: id,
+        },
+      });
+      if (!epis_chat) {
+        throw new BadRequestException('Episode x Character not found');
+      }
+
+      this.isTimeLessThan(data.time_init, data.time_finish);
+
+      const epis_char_times = await this.getAllCharactersEpisodesByCharIdEpiId(
+        epis_chat.fk_epis,
+        epis_chat.fk_char,
+      );
+
+      const times = epis_char_times
+        .filter((elem) => elem.id != id)
+        .map((elem) => elem.times);
+
+      const newStart = this.parseTimeToDate(data.time_init.value);
+      const newEnd = this.parseTimeToDate(data.time_finish.value);
+
+      if (this.isOverlapping(newStart, newEnd, times)) {
+        throw new BadRequestException(
+          'New time period overlaps with existing times.',
+        );
+      }
+
+      const duration = this.calculateDuration(data.time_init, data.time_finish);
+      if (this.isDurationExceeded(duration, times)) {
+        throw new BadRequestException('New Character period exceeds.');
+      }
+
+      return await this.prisma.epis_char.update({
+        where: {
+          id,
+        },
+        data: {
+          times: {
+            update: {
+              init: data.time_init.value,
+              finish: data.time_finish.value,
+            },
+          },
+        },
+      });
     } catch (error) {
       if (error instanceof Error) {
         throw new InternalServerErrorException(error.message);
@@ -212,7 +256,7 @@ export class CharactersEpisodesService {
 
   //______________________________________________________________________
 
-  async calculateDuration(
+  calculateDuration(
     time_init: { minutes: number; seconds: number },
     time_finish: { minutes: number; seconds: number },
   ) {
@@ -292,11 +336,32 @@ export class CharactersEpisodesService {
     newEnd: Date,
     existingTimes: { id: number; init: string; finish: string }[],
   ): boolean {
+    console.log(existingTimes);
+    console.log(newStart);
+    console.log(newEnd);
     return existingTimes.some(({ init, finish }) => {
       const parseInit = this.parseTimeToDate(init);
       const parseFinish = this.parseTimeToDate(finish);
       return newStart < parseFinish && newEnd > parseInit;
     });
+  }
+
+  isDurationExceeded(
+    currentDuration: number,
+    existingTimes: { id: number; init: string; finish: string }[],
+  ): boolean {
+    let count = 0;
+    existingTimes.forEach(({ init, finish }) => {
+      const transformTimeInit = new ParseTimePipe().transform(init);
+      const transformTimeFinish = new ParseTimePipe().transform(finish);
+      const calculateDuration = this.calculateDuration(
+        transformTimeInit,
+        transformTimeFinish,
+      );
+      count = count + calculateDuration;
+    });
+    const total = count + currentDuration;
+    return total > 60;
   }
 
   parseTimeToDate(value: string): Date {
