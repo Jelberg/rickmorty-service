@@ -1,6 +1,7 @@
 import { IsString, IsNumber, Max, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { ParseTime } from 'src/transformers/parse-time.transformer';
 
 class TypeStatDto {
   @IsNumber()
@@ -21,6 +22,16 @@ export class CreateEpisodeDto {
   @Max(60)
   @IsNumber()
   duration: number;
+
+  @IsString()
+  @ParseTime()
+  @ApiProperty({ description: 'Time initial paricipation (formart MM:SS)' })
+  time_init: string;
+
+  @IsString()
+  @ParseTime()
+  @ApiProperty({ description: 'Time final paricipation (formart MM:SS)' })
+  time_finish: string;
 
   @ApiProperty({ description: 'ID of the TypeStat' })
   @ValidateNested()
