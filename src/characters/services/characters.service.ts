@@ -13,6 +13,10 @@ import {
 import { STATUS, TYPES, CATEGORIES } from 'src/commons/enum';
 import { CreateCharacterDto } from '../dto/create-character.dto';
 import { UpdateCharacterDto } from '../dto/update-character.dto';
+import {
+  mapTypeStat,
+  mapSubcCharEpis,
+} from 'src/commons/mappers/character.mapper';
 
 @Injectable()
 export class CharactersService {
@@ -20,15 +24,7 @@ export class CharactersService {
 
   async create(data: CreateCharacterDto): Promise<CharactersModel> {
     try {
-      const characters = await this.prisma.characters.findMany({
-        where: {
-          name: data.name,
-        },
-      });
-
-      if (characters.length > 0) {
-        await this.validateSpecieAndType(data.specie, data.type, characters);
-      }
+      await this.validateSpecieAndType(data.specie, data.type, data.name);
 
       const { status_char, specie, ...restData } = data;
       const currentStatusChar = status_char ? status_char : STATUS.ACTIVE;
@@ -72,7 +68,7 @@ export class CharactersService {
     cursor?: Prisma.charactersWhereUniqueInput;
     where?: Prisma.charactersWhereInput;
     orderBy?: Prisma.charactersOrderByWithRelationInput;
-  }): Promise<{ info: any; results: any }> {
+  }): Promise<{ info: any; data: any }> {
     const { page = 1, pageSize = 5, cursor, where, orderBy } = params;
     const skip = (page - 1) * pageSize;
     const take = pageSize;
@@ -81,6 +77,22 @@ export class CharactersService {
       take,
       cursor,
       where,
+      include: {
+        type_stat: {
+          include: {
+            status: true,
+          },
+        },
+        subc_char_epis: {
+          include: {
+            subcategories: {
+              include: {
+                categories: true,
+              },
+            },
+          },
+        },
+      },
       orderBy,
     });
 
@@ -94,24 +106,67 @@ export class CharactersService {
       pages: totalPages,
     };
 
-    return { info, results };
+    const data = [];
+    results.forEach((character) => {
+      data.push({
+        id: character.id,
+        name: character.name,
+        type: character.type,
+        type_stat: mapTypeStat(character.type_stat),
+        subc_char_epis: mapSubcCharEpis(character.subc_char_epis),
+      });
+    });
+
+    return { info, data };
   }
 
   async findOne(id: number) {
-    const character = await this.prisma.characters.findUnique({
-      where: { id },
+    const character = await this.prisma.characters.findFirst({
+      where: { id: Number(id) },
+      include: {
+        type_stat: {
+          include: {
+            status: true,
+          },
+        },
+        subc_char_epis: {
+          include: {
+            subcategories: {
+              include: {
+                categories: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!character) {
       throw new NotFoundException(`Character with ID ${id} not found`);
     }
 
-    return character;
+    const formattedCharacter = {
+      id: character.id,
+      name: character.name,
+      type: character.type,
+      type_stat: mapTypeStat(character.type_stat),
+      subc_char_epis: mapSubcCharEpis(character.subc_char_epis),
+    };
+
+    return formattedCharacter;
   }
 
   async update(id: number, data: UpdateCharacterDto): Promise<CharactersModel> {
     try {
-      const { status_char, ...restData } = data;
+      const character = await this.findOne(id);
+      const currentSpecie = data.specie
+        ? data.specie
+        : character.subc_char_epis['subcategoryName'];
+      const type = data.type ? data.type : character.type;
+      const name = data.name ? data.name : character.name;
+      await this.validateSpecieAndType(currentSpecie, type, name);
+
+      const { status_char, specie, ...restData } = data;
       const updateData: any = {
         ...restData,
       };
@@ -127,7 +182,28 @@ export class CharactersService {
         };
       }
 
-      return this.prisma.characters.update({
+      if (specie) {
+        const subcategory = await this.getSubcategoryByNameAndCategory(
+          specie,
+          CATEGORIES.SPECIE,
+        );
+        if (!subcategory) {
+          throw new Error(`Subcategory with name "${specie}" not found.`);
+        }
+        //Encuentro el registro de la categoria especie
+        const findSpecie = character.subc_char_epis.find(
+          (entry) => entry.categoryName === CATEGORIES.SPECIE,
+        );
+
+        await this.prisma.subc_char_epis.update({
+          data: { fk_subc: subcategory.id },
+          where: {
+            id: findSpecie.id,
+          },
+        });
+      }
+
+      return await this.prisma.characters.update({
         data: updateData,
         where: { id: Number(id) },
       });
@@ -249,9 +325,15 @@ export class CharactersService {
   async validateSpecieAndType(
     specie: string,
     typeCharacter: string,
-    characters: CharactersModel[],
+    nameCharacter: string,
   ) {
     try {
+      const characters = await this.prisma.characters.findMany({
+        where: {
+          name: nameCharacter,
+        },
+      });
+
       const subcategories = await this.getListSubcategoriesByCategory(
         CATEGORIES.SPECIE,
       );

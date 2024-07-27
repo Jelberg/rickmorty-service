@@ -27,7 +27,7 @@ export class CreateCharacterDto {
   @IsOptional()
   @IsString()
   @IsIn([STATUS.ACTIVE, STATUS.SUSPENDED])
-  @ApiProperty({ description: 'Character status' })
+  @ApiProperty({ description: 'Character status (active or suspended)' })
   status_char?: string;
 
   /*@IsOptional()
