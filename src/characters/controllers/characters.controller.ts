@@ -89,6 +89,9 @@ export class CharactersController {
   }
 
   @Patch('delete/:id')
+  @ApiOperation({
+    summary: 'Delete: change status to suspended by character id',
+  })
   remove(@Param('id') id: string) {
     return this.charactersService.deleteCharacter({
       where: { id: Number(id) },
