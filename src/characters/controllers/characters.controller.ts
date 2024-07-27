@@ -11,14 +11,7 @@ export class CharactersController {
 
   @Post()
   create(@Body() createCharacterDto: CreateCharacterDto) {
-    return this.charactersService.create({
-      name: createCharacterDto.name,
-      type_stat: {
-        connect: {
-          id: createCharacterDto.type_stat.id,
-        },
-      },
-    });
+    return this.charactersService.create(createCharacterDto);
   }
 
   @Get()
@@ -33,24 +26,10 @@ export class CharactersController {
 
   @Patch('update/:id')
   update(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateCharacterDto: UpdateCharacterDto,
   ) {
-    const { type_stat, ...data } = updateCharacterDto;
-
-    const updateData: any = {
-      ...data,
-    };
-
-    if (type_stat) {
-      updateData.type_stat = {
-        connect: { id: type_stat.id },
-      };
-    }
-    return this.charactersService.update({
-      where: { id: Number(id) },
-      data: updateData,
-    });
+    return this.charactersService.update(id, updateCharacterDto);
   }
 
   @Patch('delete/:id')
