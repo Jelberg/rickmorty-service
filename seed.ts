@@ -29,9 +29,12 @@ async function main() {
     data: [
       { id: 1, fk_cate: 1, name: 'human' },
       { id: 2, fk_cate: 1, name: 'alien' },
-      { id: 3, fk_cate: 2, name: 'season 1' },
-      { id: 4, fk_cate: 2, name: 'season 2' },
-      { id: 5, fk_cate: 2, name: 'season 3' },
+      { id: 3, fk_cate: 2, name: 'S01' },
+      { id: 4, fk_cate: 2, name: 'S02' },
+      { id: 5, fk_cate: 2, name: 'S03' },
+      { id: 6, fk_cate: 2, name: 'S04' },
+      { id: 7, fk_cate: 2, name: 'S05' },
+      { id: 8, fk_cate: 2, name: 'S06' },
     ],
   });
 
@@ -40,7 +43,7 @@ async function main() {
       {
         id: 1,
         fk_type: 1,
-        fk_state: 3,
+        fk_state: 1,
       },
       {
         id: 2,
