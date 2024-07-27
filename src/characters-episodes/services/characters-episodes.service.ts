@@ -7,7 +7,7 @@ import { UpdateCharactersEpisodeDto } from '../dto/update-characters-episode.dto
 import { PrismaService } from 'src/prisma/services/prisma.service';
 import { Prisma, epis_char as EpisCharModel } from '@prisma/client';
 import { CreateCharactersEpisodeDto } from '../dto/create-characters-episode.dto';
-import { ParseTimePipe } from 'src/pipes/parse-time/parse-time.pipe';
+import { mapEpisodes, mapTypeStat } from 'src/commons/mappers/character.mapper';
 
 @Injectable()
 export class CharactersEpisodesService {
@@ -94,8 +94,55 @@ export class CharactersEpisodesService {
     }
   }
 
-  findAll() {
-    return `This action returns all charactersEpisodes`;
+  async findAll(params: {
+    page?: number;
+    pageSize?: number;
+    cursor?: Prisma.charactersWhereUniqueInput;
+    where?: Prisma.charactersWhereInput;
+    orderBy?: Prisma.charactersOrderByWithRelationInput;
+  }): Promise<{ info: any; data: any }> {
+    const { page = 1, pageSize = 5, cursor, where, orderBy } = params;
+    const skip = (page - 1) * pageSize;
+    const take = pageSize;
+    const results = await this.prisma.characters.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      include: {
+        epis_char: {
+          include: {
+            times: true,
+            episodes: true,
+          },
+        },
+      },
+      orderBy,
+    });
+
+    const totalCount = await this.prisma.characters.count({
+      where,
+    });
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    const info = {
+      count: totalCount,
+      pages: totalPages,
+    };
+
+    const data = [];
+    let count = 0;
+    results.forEach((element) => {
+      data.push({
+        id: element.id,
+        name: element.name,
+        type: element.type,
+        episodes: mapEpisodes(element.epis_char[count].episodes),
+      });
+      count++;
+    });
+
+    return { info, data };
   }
 
   findOne(id: number) {
