@@ -8,3 +8,8 @@ export enum STATUS {
   SUSPENDED = 'suspended',
   CANCELLED = 'cancelled',
 }
+
+export enum CATEGORIES {
+  SPECIE = 'specie',
+  SEASON = 'season',
+}
