@@ -17,6 +17,24 @@ export function mapTypeStat(typeStat: {
     : null;
 }
 
+export function mapEpisodes(episodes) {
+  if (Array.isArray(episodes)) {
+    return episodes.map((e) => ({
+      id: e.id,
+      name: e.name,
+      season: e.season,
+    }));
+  }
+
+  return episodes
+    ? {
+        id: episodes.id,
+        name: episodes.name,
+        season: episodes.season,
+      }
+    : null;
+}
+
 export function mapSubcCharEpis(
   subcCharEpis: {
     id: number;
