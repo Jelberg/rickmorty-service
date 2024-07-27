@@ -83,26 +83,13 @@ export class EpisodesController {
   }
 
   @Patch('update/:id')
+  @ApiOperation({ summary: 'Update an episode' })
   async update(
     @Param('id') id: string,
     @Body() updateEpisodeDto: UpdateEpisodeDto,
   ) {
-    const { status, ...data } = updateEpisodeDto;
-
-    const updateData: any = {
-      ...data,
-    };
-    //TODO: Revisar si se puede hacer con el update
-    /*if (status) {
-      updateData.type_stat = {
-        connect: { id: status.id },
-      };
-    }*/
-
-    return this.episodesService.update({
-      where: { id: Number(id) },
-      data: updateData,
-    });
+    console.log(updateEpisodeDto);
+    return this.episodesService.update(+id, updateEpisodeDto);
   }
 
   @Patch('delete/:id')
