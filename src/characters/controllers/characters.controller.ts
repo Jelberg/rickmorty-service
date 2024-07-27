@@ -80,6 +80,7 @@ export class CharactersController {
   }
 
   @Patch('update/:id')
+  @ApiOperation({ summary: 'Update a character' })
   update(
     @Param('id') id: number,
     @Body() updateCharacterDto: UpdateCharacterDto,

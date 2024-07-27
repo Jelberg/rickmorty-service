@@ -93,7 +93,7 @@ model subc_char_epis {
   subcategories  subcategories  @relation(fields: [fk_subc], references: [id])
   episodes       episodes?       @relation(fields: [fk_epis], references: [id])
 
-  @@unique([fk_char, fk_subc, fk_epis]) // Garantiza la unicidad de esta combinación
+  @@unique([fk_char, fk_subc, fk_epis], name: "unique_subc_char_epis") // Garantiza la unicidad de esta combinación
 }
 
 model times {
