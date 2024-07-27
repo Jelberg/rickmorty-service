@@ -9,13 +9,16 @@ export class CreateEpisodeDto {
   @IsString()
   name: string;
 
-  @ApiProperty({ description: 'Season and episode string in format S01E04' })
+  @ApiProperty({
+    description: 'Season and episode string in format ',
+    example: 'S01E04',
+  })
   @IsObject()
   @Transform(({ value }) => {
-    const pipe = new SeasonEpisodePipe(); // O el pipe que hayas creado
+    const pipe = new SeasonEpisodePipe();
     return pipe.transform(value);
   })
-  @Type(() => Object) // Indica que esperamos un objeto
+  @Type(() => Object)
   episode: { season: string; episode: string };
 
   @ApiProperty({ description: 'Duration in minutes (max 60)' })
