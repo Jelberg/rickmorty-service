@@ -1,14 +1,7 @@
 //Import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmpty, IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEmpty, IsIn, IsOptional, IsString } from 'class-validator';
 import { STATUS } from 'src/commons/enum';
-
-//eslint-disable-next-line
-class TypeStatDto {
-  @IsNumber()
-  @ApiProperty({ description: 'ID of the TypeStat' })
-  id: number;
-}
 
 export class CreateCharacterDto {
   @IsString()

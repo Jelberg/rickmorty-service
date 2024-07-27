@@ -24,7 +24,7 @@ export class CharactersController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all characters with pagination' })
+  @ApiOperation({ summary: 'Get all character with pagination' })
   @ApiQuery({
     name: 'page',
     required: false,
@@ -56,18 +56,20 @@ export class CharactersController {
     description: 'Sorting conditions in JSON format',
   })
   findAll(
-    @Query('page') page: number = 1,
-    @Query('pageSize') pageSize: number = 5,
+    @Query('page') page: string = '1',
+    @Query('pageSize') pageSize: string = '5',
     @Query('cursor') cursor?: string,
     @Query('where') where?: string,
     @Query('orderBy') orderBy?: string,
   ) {
+    const pageNumber = parseInt(page, 10);
+    const pageSizeNumber = parseInt(pageSize, 10);
     const parsedCursor = cursor ? JSON.parse(cursor) : undefined;
     const parsedWhere = where ? JSON.parse(where) : undefined;
     const parsedOrderBy = orderBy ? JSON.parse(orderBy) : undefined;
     return this.charactersService.findAll({
-      page: Number(page),
-      pageSize: Number(pageSize),
+      page: pageNumber,
+      pageSize: pageSizeNumber,
       cursor: parsedCursor,
       where: parsedWhere,
       orderBy: parsedOrderBy,
