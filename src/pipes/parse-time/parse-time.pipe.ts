@@ -37,6 +37,8 @@ export class ParseTimePipe implements PipeTransform {
     const formattedSeconds = seconds.toString().padStart(2, '0');
     value = `${formattedMinutes}:${formattedSeconds}`;
 
+    console.log(minutes, seconds, value);
+
     return { minutes, seconds, value };
   }
 }
