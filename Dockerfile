@@ -1,13 +1,20 @@
-FROM node:21
+FROM node:18
 
 WORKDIR /app
 
-COPY package*.json ./
+# Instala pnpm globalmente
+RUN npm install -g pnpm
 
-RUN npm install
+COPY pnpm-lock.yaml ./
+COPY package.json ./
+
+RUN pnpm install
 
 COPY . .
 
-RUN npm run build
+RUN npx prisma generate
 
-CMD [ "npm", "run", "start:dev" ]
+EXPOSE 3000
+
+# Comando para aplicar migraciones y luego iniciar la aplicación
+CMD ["sh", "-c", "npx prisma migrate deploy && pnpm run seed && pnpm run start:dev"]

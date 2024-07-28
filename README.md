@@ -34,13 +34,9 @@ Api de rick and morty desarrollado con NestJs con Prisma ORM.
 ### Docker
 
 ```bash
-# Contruye la imagen de docker
+
+# Contruye la imagen de docker se ejecuta en localhost:3000
 docker-compose up --build
-
-# Levanta los servicios
-docker-compose up
-
-#docker-compose exec app sh
 
 
 
@@ -55,6 +51,11 @@ npm install
 # Ejecución de la aplicación
 npm run start:dev
 ```
+
+## Data
+
+El Script de la base de datos poblada se encuentra en la raiz del proyecto (inserts.sql)
+El archivo seed.ts realiza los inserts en la base de datos
 
 ## Endpoints
 
