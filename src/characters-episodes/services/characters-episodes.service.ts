@@ -22,6 +22,17 @@ export class CharactersEpisodesService {
       if (!char || !episode) {
         throw new BadRequestException('Character or Episode not found');
       }
+      if (
+        this.isTimeExceededDurationEpisode(
+          data.time_init,
+          data.time_finish,
+          episode.duration,
+        )
+      ) {
+        throw new BadRequestException(
+          'The time init or time finish exceeds the episode duration',
+        );
+      }
       this.isTimeLessThan(data.time_init, data.time_finish);
 
       //Para validar los registros de tiempo
@@ -122,6 +133,7 @@ export class CharactersEpisodesService {
       },
       orderBy,
     });
+    console.log(results[3].epis_char.length);
 
     const totalCount = await this.prisma.characters.count({
       where,
@@ -134,15 +146,15 @@ export class CharactersEpisodesService {
     };
 
     const data = [];
-    let count = 0;
+
     results.forEach((element) => {
+      //console.log(element);
       data.push({
         id: element.id,
         name: element.name,
         type: element.type,
-        episodes: mapEpisodes(element.epis_char[count].episodes),
+        episodes: mapEpisodes(element.epis_char),
       });
-      count++;
     });
 
     return { info, data };
@@ -164,6 +176,18 @@ export class CharactersEpisodesService {
       });
       if (!epis_chat) {
         throw new BadRequestException('Episode x Character not found');
+      }
+
+      if (
+        this.isTimeExceededDurationEpisode(
+          data.time_init,
+          data.time_finish,
+          epis_chat.episodes.duration,
+        )
+      ) {
+        throw new BadRequestException(
+          'The time init or time finish exceeds the episode duration',
+        );
       }
 
       this.isTimeLessThan(data.time_init, data.time_finish);
@@ -342,9 +366,6 @@ export class CharactersEpisodesService {
     newEnd: Date,
     existingTimes: { id: number; init: string; finish: string }[],
   ): boolean {
-    console.log(existingTimes);
-    console.log(newStart);
-    console.log(newEnd);
     return existingTimes.some(({ init, finish }) => {
       const parseInit = this.parseTimeToDate(init);
       const parseFinish = this.parseTimeToDate(finish);
@@ -369,6 +390,21 @@ export class CharactersEpisodesService {
     });
     const total = count + currentDuration;
     return total > episodeDuration || total > 60;
+  }
+
+  //Para validar que los minutos registrados no excedan a la duracion del episodio
+  isTimeExceededDurationEpisode(
+    time_init: { minutes: number; seconds: number },
+    time_finish: { minutes: number; seconds: number },
+    episodeDuration: number,
+  ): boolean {
+    if (time_init.minutes >= episodeDuration) {
+      return true;
+    }
+    if (time_finish.minutes >= episodeDuration) {
+      return true;
+    }
+    return false;
   }
 
   parseTimeToDate(value: string): Date {

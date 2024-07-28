@@ -20,9 +20,10 @@ export function mapTypeStat(typeStat: {
 export function mapEpisodes(episodes) {
   if (Array.isArray(episodes)) {
     return episodes.map((e) => ({
-      id: e.id,
-      name: e.name,
-      season: e.season,
+      id: e.episodes.id,
+      name: e.episodes.name,
+      season: e.episodes.season,
+      duration: e.episodes.duration,
     }));
   }
 
@@ -31,8 +32,9 @@ export function mapEpisodes(episodes) {
         id: episodes.id,
         name: episodes.name,
         season: episodes.season,
+        duration: episodes.duration,
       }
-    : null;
+    : [];
 }
 
 export function mapSubcCharEpis(
