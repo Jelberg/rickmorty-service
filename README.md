@@ -2,7 +2,7 @@
 
 # Rick & Morty Service
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor.
+Api de rick and morty desarrollado con NestJs con Prisma ORM.
 
 ## Database and relationship
 
@@ -17,6 +17,10 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendi
 **SUBC_CHAR_EPIS:** Tabla de relación entre personajes, subcategorías y episodios.  
 **TIMES:** Tabla para almacenar los tiempos de inicio y finalización de la participación de los personajes en los episodios.
 
+### Bosquejo del modelo de ER
+
+![ER](imgs/2.png)
+
 ## Tech Stack
 
 ⚒️ NextJS | Prisma ORM
@@ -27,10 +31,20 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendi
 
 ## Despligue
 
+### Docker
+
+```bash
+
+docker-compose up --build
+
+```
+
+###Local
+
 ```bash
 # Instalación de paquetes
 npm install
 
 # Ejecución de la aplicación
-npm run dev
+npm run start:dev
 ```
