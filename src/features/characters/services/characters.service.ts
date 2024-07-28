@@ -240,11 +240,22 @@ export class CharactersService {
     }
   }
 
-  async find(species: string, type: string) {
+  async find(species: string, type?: string) {
     try {
+      const where = type ? { type: { contains: type } } : {};
       const characters = await this.prisma.characters.findMany({
         where: {
-          type: type,
+          ...where,
+          subc_char_epis: {
+            some: {
+              subcategories: {
+                name: species,
+                categories: {
+                  name: CATEGORIES.SPECIE,
+                },
+              },
+            },
+          },
         },
         include: {
           subc_char_epis: {
@@ -255,21 +266,28 @@ export class CharactersService {
                 },
               },
             },
-            where: {
-              subcategories: {
-                name: species,
-                categories: {
-                  name: CATEGORIES.SPECIE,
-                },
-              },
-            },
           },
         },
       });
 
-      return characters;
+      const data = [];
+      characters.map((character) => {
+        data.push({
+          id: character.id,
+          name: character.name,
+          type: character.type,
+          categories: CATEGORIES.SPECIE,
+          subcategories: mapSubcCharEpis(character.subc_char_epis),
+        });
+      });
+
+      return data;
     } catch (error) {
-      console.log(error);
+      if (error instanceof Error) {
+        throw new InternalServerErrorException(error.message);
+      } else {
+        throw new InternalServerErrorException('An unknown error occurred');
+      }
     }
   }
 

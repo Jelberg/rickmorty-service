@@ -27,6 +27,7 @@ export class CharactersEpisodesController {
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Update time of a Characters x Episode' })
   update(
     @Param('id') id: string,
     @Body() updateCharactersEpisodeDto: UpdateCharactersEpisodeDto,
@@ -94,5 +95,39 @@ export class CharactersEpisodesController {
       where: parsedWhere,
       orderBy: parsedOrderBy,
     });
+  }
+
+  @Get('find-characters')
+  @ApiOperation({ summary: 'Find characters with filters' })
+  @ApiQuery({
+    name: 'characterStatus',
+    required: false,
+    type: 'string',
+    description: 'Filter by character status',
+  })
+  @ApiQuery({
+    name: 'episodeStatus',
+    required: false,
+    type: 'string',
+    description: 'Filter by episode status',
+  })
+  @ApiQuery({
+    name: 'season',
+    required: false,
+    type: 'string',
+    description: 'Filter by season',
+  })
+  async findCharacters(
+    @Query('characterStatus') characterStatus: string,
+    @Query('episodeStatus') episodeStatus: string,
+    @Query('season') season: string,
+  ) {
+    const filters = {
+      characterStatus: characterStatus ? characterStatus : undefined,
+      episodeStatus: episodeStatus ? episodeStatus : undefined,
+      season: season || undefined,
+    };
+
+    return this.charactersEpisodesService.findCharacters(filters);
   }
 }

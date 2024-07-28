@@ -37,6 +37,22 @@ export function mapEpisodes(episodes) {
     : [];
 }
 
+export function mapSubCharEpis(
+  subcCharEpis: {
+    id: number;
+    fk_char: number;
+    fk_subc: number;
+    fk_epis: number;
+    subcategories: { name: string; id: number };
+  }[],
+): { id: number; subcategoryId: number; subcategoryName: string }[] {
+  return subcCharEpis.map((sce) => ({
+    id: sce.id,
+    subcategoryId: sce.subcategories.id,
+    subcategoryName: sce.subcategories.name,
+  }));
+}
+
 export function mapSubcCharEpis(
   subcCharEpis: {
     id: number;
@@ -45,7 +61,7 @@ export function mapSubcCharEpis(
 ): { id: number; subcategoryName: string; categoryName: string }[] {
   return subcCharEpis.map((sce) => ({
     id: sce.id,
-    subcategoryName: sce.subcategories.name,
     categoryName: sce.subcategories.categories.name,
+    subcategoryName: sce.subcategories.name,
   }));
 }
