@@ -284,6 +284,97 @@ export class CharactersEpisodesService {
     }
   }
 
+  async findCharacters(params): Promise<any[]> {
+    try {
+      const { characterStatus, episodeStatus, season } = params;
+
+      const newSeason = season ? { episode: { contains: season } } : {};
+      const newCharacterStatus = characterStatus
+        ? { type_stat: { status: { name: characterStatus } } }
+        : {};
+      const newEpisodeStatus = episodeStatus
+        ? { type_stat: { status: { name: episodeStatus } } }
+        : {};
+
+      const conditionEpiChar =
+        episodeStatus || season
+          ? {
+              epis_char: {
+                some: {
+                  episodes: {
+                    ...newEpisodeStatus,
+                    ...newSeason,
+                  },
+                },
+              },
+            }
+          : {};
+
+      const results = await this.prisma.characters.findMany({
+        where: {
+          ...newCharacterStatus,
+          ...conditionEpiChar,
+        },
+        include: {
+          type_stat: {
+            include: {
+              status: true,
+            },
+          },
+          epis_char: {
+            include: {
+              times: true,
+              episodes: {
+                include: {
+                  type_stat: {
+                    include: {
+                      status: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const data = results.map((character) => {
+        // Episodios por ID y consolidar los tiempos
+        const episodesMap = new Map<number, any>();
+
+        character.epis_char.forEach((ec) => {
+          if (!episodesMap.has(ec.episodes.id)) {
+            episodesMap.set(ec.episodes.id, {
+              episodeId: ec.episodes.id,
+              episodeName: ec.episodes.name,
+              episodeDuration: ec.episodes.duration,
+              status: ec.episodes.type_stat.status.name,
+              times: [],
+            });
+          }
+          episodesMap.get(ec.episodes.id)?.times.push(ec.times);
+        });
+        const episodes = Array.from(episodesMap.values());
+
+        return {
+          id: character.id,
+          name: character.name,
+          type: character.type,
+          status: character.type_stat?.status?.name || 'Unknown',
+          episodes: episodes,
+        };
+      });
+
+      return data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new InternalServerErrorException(error.message);
+      } else {
+        throw new InternalServerErrorException('An unknown error occurred');
+      }
+    }
+  }
+
   //______________________________________________________________________
 
   calculateDuration(

@@ -10,7 +10,7 @@ import {
 import { CharactersService } from '../services/characters.service';
 import { CreateCharacterDto } from '../dto/create-character.dto';
 import { UpdateCharacterDto } from '../dto/update-character.dto';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @Controller('characters')
 @ApiTags('Characters')
@@ -81,10 +81,23 @@ export class CharactersController {
     return this.charactersService.findOne(+id);
   }
 
-  /*@Get(':specie/:type')
-  find(@Param('specie') specie: string, @Param('type') type: string) {
+  @Get(':specie/:type?')
+  @ApiOperation({ summary: 'Find characters by specie and type' })
+  @ApiParam({
+    name: 'specie',
+    required: true,
+    description: 'Specie of the character',
+  })
+  @ApiParam({
+    name: 'type',
+    required: false,
+    description: 'Type of the character (optional)',
+    schema: { type: 'string', nullable: true },
+  })
+  find(@Param('specie') specie: string, @Param('type') type?: string) {
+    type = type === '{type}' ? undefined : type; // Para que pueda funcionar desde swagger cuando no se envia el parametro
     return this.charactersService.find(specie, type);
-  }*/
+  }
 
   @Patch('update/:id')
   @ApiOperation({ summary: 'Update a character' })

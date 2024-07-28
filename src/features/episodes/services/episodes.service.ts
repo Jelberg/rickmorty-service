@@ -138,9 +138,8 @@ export class EpisodesService {
         name: episode.name,
         episode: episode.episode,
         duration: episode.duration,
-        type_stat: mapTypeStat(episode.type_stat),
-        subc_char_epis: mapSubcCharEpis(episode.subc_char_epis),
-        // Puedes agregar más campos aquí si es necesario
+        status: mapTypeStat(episode.type_stat),
+        categories: mapSubcCharEpis(episode.subc_char_epis),
       }));
 
       return { info, data };
@@ -219,8 +218,8 @@ export class EpisodesService {
       name: episode.name,
       duration: episode.duration,
       episode: episode.episode,
-      type_stat: mapTypeStat(episode.type_stat),
-      subc_char_epis: mapSubcCharEpis(episode.subc_char_epis),
+      status: mapTypeStat(episode.type_stat),
+      categories: mapSubcCharEpis(episode.subc_char_epis),
     };
 
     return formattedCharacter;
@@ -234,7 +233,7 @@ export class EpisodesService {
       };
       const currentEpisode = await this.findOne(id);
       if (data.name || data.episode) {
-        const value = currentEpisode.subc_char_epis.find(
+        const value = currentEpisode.categories.find(
           (season) => season.categoryName === CATEGORIES.SEASON,
         );
         const currentName = data.name ? data.name : currentEpisode.name;
@@ -266,7 +265,7 @@ export class EpisodesService {
         }
 
         //Encuentro el registro de la categoria del episodio
-        const findEpisode = currentEpisode.subc_char_epis.find(
+        const findEpisode = currentEpisode.categories.find(
           (entry) => entry.subcategoryName === CATEGORIES.SEASON,
         );
 
