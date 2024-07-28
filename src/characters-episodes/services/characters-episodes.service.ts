@@ -5,9 +5,9 @@ import {
 } from '@nestjs/common';
 import { UpdateCharactersEpisodeDto } from '../dto/update-characters-episode.dto';
 import { PrismaService } from 'src/prisma/services/prisma.service';
-import { Prisma, epis_char as EpisCharModel } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { CreateCharactersEpisodeDto } from '../dto/create-characters-episode.dto';
-import { mapEpisodes, mapTypeStat } from 'src/commons/mappers/character.mapper';
+import { mapEpisodes } from 'src/commons/mappers/character.mapper';
 import { ParseTimePipe } from 'src/pipes/parse-time/parse-time.pipe';
 
 @Injectable()
@@ -24,6 +24,7 @@ export class CharactersEpisodesService {
       }
       this.isTimeLessThan(data.time_init, data.time_finish);
 
+      //Para validar los registros de tiempo
       const epis_char = await this.getAllCharactersEpisodesByCharIdEpiId(
         data.fk_epis,
         data.fk_char,
@@ -40,7 +41,7 @@ export class CharactersEpisodesService {
         );
       }
       const duration = this.calculateDuration(data.time_init, data.time_finish);
-      if (this.isDurationExceeded(duration, times)) {
+      if (this.isDurationExceeded(duration, times, episode.duration)) {
         throw new BadRequestException('New Character period exceeds.');
       }
 
@@ -157,6 +158,9 @@ export class CharactersEpisodesService {
         where: {
           id: id,
         },
+        include: {
+          episodes: true,
+        },
       });
       if (!epis_chat) {
         throw new BadRequestException('Episode x Character not found');
@@ -183,7 +187,9 @@ export class CharactersEpisodesService {
       }
 
       const duration = this.calculateDuration(data.time_init, data.time_finish);
-      if (this.isDurationExceeded(duration, times)) {
+      if (
+        this.isDurationExceeded(duration, times, epis_chat.episodes.duration)
+      ) {
         throw new BadRequestException('New Character period exceeds.');
       }
 
@@ -349,6 +355,7 @@ export class CharactersEpisodesService {
   isDurationExceeded(
     currentDuration: number,
     existingTimes: { id: number; init: string; finish: string }[],
+    episodeDuration: number,
   ): boolean {
     let count = 0;
     existingTimes.forEach(({ init, finish }) => {
@@ -361,7 +368,7 @@ export class CharactersEpisodesService {
       count = count + calculateDuration;
     });
     const total = count + currentDuration;
-    return total > 60;
+    return total > episodeDuration || total > 60;
   }
 
   parseTimeToDate(value: string): Date {

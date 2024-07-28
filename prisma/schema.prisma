@@ -76,7 +76,7 @@ model epis_char {
   fk_char    Int      // Campo escalar para la clave foránea
   fk_epis    Int      // Campo escalar para la clave foránea
   fk_time    Int      // Campo escalar para la clave foránea
-  duration   Int?      // Duración en minutos
+
 
   characters    characters  @relation(fields: [fk_char], references: [id])
   episodes      episodes    @relation(fields: [fk_epis], references: [id])
