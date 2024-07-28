@@ -14,6 +14,15 @@ async function bootstrap() {
     }),
   );
 
+  app.enableCors({
+    origin: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders:
+      'Content-Type,Authorization,X-Requested-With,Accept-Language',
+    optionsSuccessStatus: 204,
+    credentials: true,
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Rick and Morty API')
     .setDescription('The Rick and Morty API from D4T')

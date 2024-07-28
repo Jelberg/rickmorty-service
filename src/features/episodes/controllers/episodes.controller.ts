@@ -80,7 +80,6 @@ export class EpisodesController {
   @Get(':season')
   @ApiOperation({ summary: 'Get all episodes by season' })
   findBySeason(@Param('season') season: string) {
-    console.log(season);
     return this.episodesService.findBySeason(season);
   }
 

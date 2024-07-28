@@ -11,7 +11,9 @@ describe('CharactersEpisodesController', () => {
       providers: [CharactersEpisodesService],
     }).compile();
 
-    controller = module.get<CharactersEpisodesController>(CharactersEpisodesController);
+    controller = module.get<CharactersEpisodesController>(
+      CharactersEpisodesController,
+    );
   });
 
   it('should be defined', () => {
