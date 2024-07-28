@@ -153,6 +153,42 @@ export class EpisodesService {
     }
   }
 
+  async findBySeason(season: string) {
+    try {
+      const episodes = await this.prisma.episodes.findMany({
+        where: {
+          subc_char_epis: {
+            some: {
+              subcategories: {
+                name: season,
+              },
+            },
+          },
+        },
+        include: {
+          subc_char_epis: {
+            include: {
+              subcategories: true,
+            },
+          },
+        },
+      });
+      const data = episodes.map((episode) => ({
+        id: episode.id,
+        name: episode.name,
+        duration: episode.duration,
+        episode: episode.subc_char_epis,
+      }));
+      return data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new InternalServerErrorException(error.message);
+      } else {
+        throw new InternalServerErrorException('An unknown error occurred');
+      }
+    }
+  }
+
   async findOne(id: number) {
     const episode = await this.prisma.episodes.findFirst({
       where: { id: Number(id) },

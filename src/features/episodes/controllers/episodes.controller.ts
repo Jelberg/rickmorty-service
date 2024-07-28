@@ -77,9 +77,11 @@ export class EpisodesController {
     });
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.episodesService.findOne(+id);
+  @Get(':season')
+  @ApiOperation({ summary: 'Get all episodes by season' })
+  findBySeason(@Param('season') season: string) {
+    console.log(season);
+    return this.episodesService.findBySeason(season);
   }
 
   @Patch('update/:id')
