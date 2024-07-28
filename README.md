@@ -58,4 +58,4 @@ npm run start:dev
 
 ## Endpoints
 
-La especificacion de los endpoints se construto con swagger el cual al ejecutar el proyecto se puede ver en el siguiente enlace: http://localhost:3000/api
+La especificacion de los endpoints se construyo con swagger el cual al ejecutar el proyecto se puede ver en el siguiente enlace: http://localhost:3000/api
