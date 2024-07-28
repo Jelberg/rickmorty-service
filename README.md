@@ -35,7 +35,7 @@ Api de rick and morty desarrollado con NestJs con Prisma ORM.
 
 ```bash
 
-# Contruye la imagen de docker se ejecuta en localhost:3000
+# Contruye la imagen de docker. Se ejecuta el servicio en localhost:3000
 docker-compose up --build
 # Inportante el .env se puede usar tal cual el .env.example
 
