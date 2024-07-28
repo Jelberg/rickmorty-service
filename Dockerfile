@@ -16,4 +16,5 @@ RUN npx prisma generate
 
 EXPOSE 3000
 
-CMD ["pnpm", "run", "start:dev"]
+# Comando para aplicar migraciones y luego iniciar la aplicación
+CMD ["sh", "-c", "npx prisma migrate deploy && pnpm run seed && pnpm run start:dev"]
