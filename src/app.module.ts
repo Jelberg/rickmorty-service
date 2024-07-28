@@ -3,9 +3,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaService } from './prisma/services/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
-import { EpisodesModule } from './episodes/episodes.module';
-import { CharactersModule } from './characters/characters.module';
-import { CharactersEpisodesModule } from './characters-episodes/characters-episodes.module';
+import { EpisodesModule } from './features/episodes/episodes.module';
+import { CharactersModule } from './features/characters/characters.module';
+import { CharactersEpisodesModule } from './features/characters-episodes/characters-episodes.module';
 
 @Module({
   imports: [
