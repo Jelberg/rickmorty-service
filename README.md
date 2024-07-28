@@ -34,12 +34,19 @@ Api de rick and morty desarrollado con NestJs con Prisma ORM.
 ### Docker
 
 ```bash
-
+# Contruye la imagen de docker
 docker-compose up --build
+
+# Levanta los servicios
+docker-compose up
+
+#docker-compose exec app sh
+
+
 
 ```
 
-###Local
+### Local
 
 ```bash
 # Instalación de paquetes
@@ -48,3 +55,7 @@ npm install
 # Ejecución de la aplicación
 npm run start:dev
 ```
+
+## Endpoints
+
+La especificacion de los endpoints se construto con swagger el cual al ejecutar el proyecto se puede ver en el siguiente enlace: http://localhost:3000/api
