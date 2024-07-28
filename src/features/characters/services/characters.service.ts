@@ -240,6 +240,13 @@ export class CharactersService {
     }
   }
 
+  /*async find(species: string, type: string) {
+    try {
+    } catch (error) {
+      console.log(error);
+    }
+  }*/
+
   //_____________________________________________________________________
 
   async getTypeStat(status: string, type: string) {

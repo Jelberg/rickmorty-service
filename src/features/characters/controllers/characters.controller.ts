@@ -81,6 +81,11 @@ export class CharactersController {
     return this.charactersService.findOne(+id);
   }
 
+  /*@Get(':specie/:type')
+  find(@Param('specie') specie: string, @Param('type') type: string) {
+    return this.charactersService.find(specie, type);
+  }*/
+
   @Patch('update/:id')
   @ApiOperation({ summary: 'Update a character' })
   update(
