@@ -240,12 +240,38 @@ export class CharactersService {
     }
   }
 
-  /*async find(species: string, type: string) {
+  async find(species: string, type: string) {
     try {
+      const characters = await this.prisma.characters.findMany({
+        where: {
+          type: type,
+        },
+        include: {
+          subc_char_epis: {
+            include: {
+              subcategories: {
+                include: {
+                  categories: true,
+                },
+              },
+            },
+            where: {
+              subcategories: {
+                name: species,
+                categories: {
+                  name: CATEGORIES.SPECIE,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return characters;
     } catch (error) {
       console.log(error);
     }
-  }*/
+  }
 
   //_____________________________________________________________________
 
