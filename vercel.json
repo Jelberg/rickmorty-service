@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "npm start",
-  "installCommand": "npm install",
+  "buildCommand": "pnpm start",
+  "installCommand": "pnpm install",
   "builds": [
     {
       "src": "src/main.ts",
