@@ -3,17 +3,6 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.types.deleteMany({});
-  await prisma.status.deleteMany({});
-  await prisma.categories.deleteMany({});
-  await prisma.subcategories.deleteMany({});
-  await prisma.type_stat.deleteMany({});
-  await prisma.characters.deleteMany({});
-  await prisma.episodes.deleteMany({});
-  await prisma.times.deleteMany({});
-  await prisma.epis_char.deleteMany({});
-  await prisma.subc_char_epis.deleteMany({});
-
   await prisma.types.createMany({
     data: [
       { id: 1, name: 'episodes' },
