@@ -1,4 +1,6 @@
 ![Rick and Morty](imgs/rickandmorty.jpeg)
+URL: https://rickmorty-service.onrender.com
+DOC: https://rickmorty-service.onrender.com/api
 
 # Rick & Morty Service
 
