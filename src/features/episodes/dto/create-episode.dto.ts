@@ -1,4 +1,4 @@
-import { IsObject, IsString, IsNumber, Max, IsIn } from 'class-validator';
+import { IsObject, IsString, IsNumber, Max, IsIn, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { SeasonEpisodePipe } from 'src/pipes/season-episode/season-episode.pipe';
 import { Transform, Type } from 'class-transformer';
@@ -23,6 +23,7 @@ export class CreateEpisodeDto {
 
   @ApiProperty({ description: 'Duration in minutes (max 60)' })
   @IsNumber()
+  @Min(0)
   @Max(60)
   duration: number;
 
